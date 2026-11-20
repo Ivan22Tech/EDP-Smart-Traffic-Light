@@ -1,175 +1,256 @@
 
 # System Architecture
 
-## EDP Smart Traffic Light System
-
 ## 1. Overview
 
-The application simulates a smart traffic intersection using
-Event-Driven Programming.
+The Smart Traffic Light System follows an Event-Driven Programming (EDP) architecture.
 
-It uses Python, Tkinter and a local event queue.
+The application reacts to events instead of relying only on sequential execution.
 
-The system supports:
-- Automatic traffic light switching.
-- Pedestrian crossing requests.
-- Emergency vehicle priority.
-- Graphical monitoring and control.
+The project has two implementations:
 
-## 2. Architecture Components
+- Python software implementation.
+- ESP32 hardware simulation.
 
-### A. Event Producers
+Both implementations demonstrate automatic traffic control, pedestrian requests and emergency handling.
 
-Event producers generate events when an action occurs.
+---
 
-Examples:
+## 2. Python Architecture
 
-- Start System button.
-- Automatic timer.
-- Pedestrian Request button.
-- Emergency Vehicle button.
+The Python implementation is divided into separate modules.
 
-Implemented in:
+### Event Producers
 
-event_producers.py
-
-### B. Event Queue
-
-The application uses Python queue.Queue to store events
-until they are processed.
-
-Implemented in:
-
-event_queue.py
-
-The queue operates locally without requiring a network.
-
-### C. Event Handlers
-
-Event handlers receive events and decide what action
-the application should perform.
+Event producers generate events when something happens.
 
 Examples:
 
-- Change GREEN to YELLOW.
-- Change YELLOW to RED.
-- Activate pedestrian crossing.
-- Activate emergency priority.
+- System startup.
+- Timer expiration.
+- Pedestrian button request.
+- Emergency vehicle detection.
 
-Implemented in:
+### Event Queue
 
-event_handlers.py
+The event queue stores events until they are processed.
 
-### D. Traffic Light Controller
+It provides a separation between event production and event handling.
 
-The TrafficLight class stores and changes the current
-traffic light state.
+### Event Handlers
 
-Possible states:
+Event handlers process events and execute the corresponding actions.
 
-- OFF
-- GREEN
-- YELLOW
-- RED
+Examples:
 
-Implemented in:
+- Changing traffic light states.
+- Activating pedestrian crossing.
+- Handling emergency priority.
+- Updating the graphical interface.
 
-traffic_light.py
-
-### E. Graphical User Interface
-
-Tkinter provides the visual interface.
-
-It displays:
-
-- Traffic light colors.
-- System status.
-- Pedestrian status.
-- Emergency status.
-- Event monitor.
-
-Implemented in:
-
-traffic_gui.py
-
-### F. Main Application
-
-main.py launches the graphical application.
-
-## 3. Architecture Diagram
+### Python Architecture Diagram
 
 ```text
-             EVENT PRODUCERS
-                    |
-          +---------+---------+
-          |         |         |
-        START     TIMER    PEDESTRIAN
-          |         |       EMERGENCY
-          +---------+---------+
-                    |
-                    v
-              EVENT QUEUE
-              (queue.Queue)
-                    |
-                    v
-              EVENT HANDLERS
-                    |
-                    v
-             TRAFFIC LIGHT
-               CONTROLLER
-                    |
-                    v
-              GUI DISPLAY
-                (Tkinter)
++---------------------------+
+|       Event Producers     |
+|                           |
+| - Timer                   |
+| - Pedestrian Request      |
+| - Emergency Detection     |
+| - System Startup          |
++-------------+-------------+
+              |
+              v
++---------------------------+
+|        Event Queue        |
+|                           |
+|     Local Event Queue     |
++-------------+-------------+
+              |
+              v
++---------------------------+
+|       Event Handlers      |
+|                           |
+| - Timer Handler           |
+| - Pedestrian Handler      |
+| - Emergency Handler       |
++-------------+-------------+
+              |
+              v
++---------------------------+
+|      Traffic Light        |
+|                           |
+|   RED / YELLOW / GREEN    |
++-------------+-------------+
+              |
+              v
++---------------------------+
+|       Tkinter GUI         |
+|                           |
+|   Visual State Updates    |
++---------------------------+
 ```
 
-## 4. Automatic Timer
+---
 
-The application uses Tkinter's after() function
-to schedule automatic timer events.
+## 3. ESP32 Hardware Architecture
 
-The timer generates TIMER_EXPIRED events without
-blocking the graphical interface.
+The ESP32 implementation uses Arduino C++.
 
-Traffic light timing:
+It consists of:
 
-- GREEN: 3 seconds
-- YELLOW: 2 seconds
-- RED: 3 seconds
+### Event Producers
 
-The sequence repeats automatically.
+- Timer expiration detection.
+- Pedestrian button detection.
+- Emergency command detection through Serial Monitor.
 
-## 5. Pedestrian Event Flow
+### Event Processing
 
-1. A pedestrian presses the request button.
-2. PEDESTRIAN_REQUEST is generated.
-3. The event enters the local queue.
-4. The handler records the request.
-5. When the traffic light reaches RED, crossing becomes active.
-6. The next timer event finishes the crossing.
+The ESP32 checks incoming events and processes them using event-handling functions.
 
-## 6. Emergency Event Flow
+The current implementation processes events directly in the main loop rather than using a separate FIFO event queue.
 
-1. An emergency vehicle is detected through the GUI button.
-2. EMERGENCY_DETECTED is generated.
-3. The event enters the local queue.
-4. The handler activates emergency priority.
-5. The traffic light changes immediately to RED.
-6. The next timer event clears emergency priority.
+### Event Handlers
 
-## 7. Technologies
+The main event-handling function processes timer events.
 
-- Python 3.13
-- Tkinter
-- Python queue.Queue
-- Event-Driven Programming
-- Visual Studio Code
-- Git and GitHub
+Other functions handle pedestrian requests and emergency detection.
 
-## 8. Conclusion
+### Hardware Outputs
 
-The project demonstrates Event-Driven Programming through
-event producers, a local event queue and event handlers.
+The RGB LED represents the traffic light.
 
-It combines automatic scheduling with graphical interaction
-to simulate a smart traffic light system.
+The pedestrian push button generates pedestrian request events.
+
+### ESP32 Architecture Diagram
+
+```text
++---------------------------+
+|       Event Producers     |
+|                           |
+| - Timer Detection         |
+| - Pedestrian Button       |
+| - Serial Emergency Input  |
++-------------+-------------+
+              |
+              v
++---------------------------+
+|    Event Processing      |
+|                           |
+| - checkButton()           |
+| - pedestrianRequest()     |
+| - emergencyDetected()     |
++-------------+-------------+
+              |
+              v
++---------------------------+
+|       Event Handlers      |
+|                           |
+| - handleTimerEvent()      |
+| - changeLight()           |
++-------------+-------------+
+              |
+              v
++---------------------------+
+|       ESP32 Outputs       |
+|                           |
+| - RGB LED                 |
+| - Serial Monitor          |
++---------------------------+
+```
+
+---
+
+## 4. Hardware Configuration
+
+| Component | GPIO |
+|---|---|
+| Red LED | 25 |
+| Green LED | 26 |
+| Blue LED | 27 |
+| Pedestrian Button | 14 |
+| RGB Common Cathode | GND |
+
+Each RGB color connection uses a 220Ω resistor.
+
+The RGB LED operates in common-cathode mode:
+
+- LOW = OFF
+- HIGH = ON
+
+The pedestrian button uses INPUT_PULLUP.
+
+---
+
+## 5. Traffic Light State Machine
+
+The normal traffic sequence is:
+
+```text
+GREEN
+  |
+  | TIMER_EXPIRED
+  v
+YELLOW
+  |
+  | TIMER_EXPIRED
+  v
+RED
+  |
+  | TIMER_EXPIRED
+  v
+GREEN
+```
+
+### State Durations
+
+| State | Duration |
+|---|---:|
+| GREEN | 3 seconds |
+| YELLOW | 2 seconds |
+| RED | 3 seconds |
+| Pedestrian Crossing | 5 seconds |
+
+---
+
+## 6. Pedestrian Event Flow
+
+1. The pedestrian presses the push button.
+2. The system generates PEDESTRIAN_REQUEST.
+3. The request is marked as pending.
+4. The current traffic sequence continues.
+5. The traffic light reaches RED.
+6. Pedestrian crossing is activated.
+7. The system waits five seconds.
+8. Crossing is completed.
+9. GREEN is activated again.
+
+---
+
+## 7. Emergency Event Flow
+
+1. The user sends the E command through Serial Monitor.
+2. The system detects EMERGENCY_DETECTED.
+3. Emergency priority is activated.
+4. The traffic light immediately changes to RED.
+5. The emergency timer starts.
+6. After three seconds, emergency priority is cleared.
+7. GREEN is activated again.
+
+---
+
+## 8. Event-Driven Programming Principles
+
+The project demonstrates:
+
+- Event producers generating events.
+- Event queues in the Python implementation.
+- Event handling.
+- Separation of application components.
+- State management.
+- Timer-based events.
+- User-generated events.
+- Priority-based emergency handling.
+
+The ESP32 version is a hardware-oriented implementation of the same traffic control concept.
