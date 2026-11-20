@@ -1,80 +1,87 @@
 
-# Smart Traffic Light System
+# 🚦 Smart Traffic Light System
 
 ## Event-Driven Programming (EDP) Project
 
-### 1. Project Description
+**Project:** Event-Driven Smart Traffic Light System  
+**Developer:** Ivan Sadek  
+**Technology:** Python, Arduino C++, ESP32, Wokwi
 
-The Smart Traffic Light System is a Python application that
-simulates an intelligent traffic intersection using
-Event-Driven Programming.
+---
 
-The application includes a graphical interface built with
-Tkinter and a local event queue.
+## 1. Project Description
 
-### 2. Features
+The Smart Traffic Light System is an Event-Driven Programming project that simulates an intelligent traffic intersection.
 
-- Automatic traffic light switching.
-- GREEN, YELLOW and RED traffic light states.
+The system uses events to control traffic lights automatically and respond to external requests, including pedestrian crossings and emergency vehicles.
+
+The project has two implementations:
+
+1. **Python Application:** A graphical traffic light simulator using Tkinter and an event-driven architecture.
+2. **ESP32 Hardware Simulation:** An Arduino-based implementation using an ESP32, RGB LED and pedestrian push button, simulated with Wokwi.
+
+---
+
+## 2. Main Features
+
+- Automatic traffic light sequencing.
+- Red, yellow and green traffic states.
 - Pedestrian crossing requests.
 - Emergency vehicle priority.
-- Automatic timer events.
-- Pause and resume functionality.
-- Live event monitoring.
-- Local event queue.
+- Event producers and event handlers.
+- Local event queue in the Python implementation.
+- RGB LED hardware simulation.
+- Serial Monitor event logging.
+- Automatic timer-based transitions.
 
-### 3. Technologies Used
+---
 
-- Python 3.13
-- Tkinter
-- queue.Queue
-- Visual Studio Code
-- GitHub
-
-### 4. Project Structure
+## 3. Project Structure
 
 ```text
 EDP-Smart-Traffic-Light/
+│
+├── hardware/
+│   ├── sketch.ino
+│   └── diagram.json
 │
 ├── main.py
 ├── traffic_gui.py
 ├── traffic_light.py
 ├── event_queue.py
-├── event_producers.py
 ├── event_handlers.py
+├── event_producers.py
 │
 ├── events.md
 ├── architecture.md
-├── README.md
-│
-└── .gitignore
+└── README.md
 ```
 
-### 5. Architecture
+The `hardware` folder contains the ESP32 Arduino implementation and the Wokwi circuit diagram.
 
-The system follows the Event-Driven Programming model.
+---
 
-**Event Producers:**
-Generate events from buttons and automatic timers.
+## 4. Technologies Used
 
-**Event Queue:**
-Stores events locally using Python queue.Queue.
+| Technology | Purpose |
+|---|---|
+| Python | Main application |
+| Tkinter | Graphical user interface |
+| Arduino C++ | ESP32 implementation |
+| ESP32 | Hardware controller |
+| Wokwi | Hardware simulation |
+| GitHub | Source code and documentation |
 
-**Event Handlers:**
-Process events and update the traffic light state.
+---
 
-**GUI:**
-Displays the traffic light and application status.
+## 5. How to Run the Python Application
 
-### 6. Installation Requirements
+### Requirements
 
+- Python 3 installed.
 - Windows, Linux or macOS.
-- Python 3.13 or compatible Python 3 version.
-- Git.
 
-Tkinter is included with standard Windows Python installations.
-
-### 7. How to Run
+### Installation
 
 Clone the repository:
 
@@ -88,49 +95,125 @@ Open the project directory:
 cd EDP-Smart-Traffic-Light
 ```
 
-Run the application on Windows:
+Run the application:
 
 ```bash
-py -3.13 main.py
+python main.py
 ```
 
-On systems where Python is available as python3:
+On Windows, you can also use:
 
 ```bash
-python3 main.py
+py main.py
 ```
 
-### 8. How to Use
+---
 
-1. Click START SYSTEM.
-2. The traffic light starts with GREEN.
-3. The lights change automatically:
-   GREEN → YELLOW → RED → GREEN.
-4. Use PAUSE SYSTEM to pause automatic switching.
-5. Use RESUME SYSTEM to continue.
-6. Use PEDESTRIAN REQUEST to request crossing.
-7. Use EMERGENCY VEHICLE to activate emergency priority.
-8. Monitor events in the Event Monitor panel.
+## 6. How to Run the ESP32 Version
 
-### 9. Traffic Light Timing
+The hardware implementation is designed for the Wokwi ESP32 simulator.
 
-| Light | Duration |
-|-------|----------|
-| GREEN | 3 seconds |
-| YELLOW | 2 seconds |
-| RED | 3 seconds |
+### Steps
 
-### 10. Documentation
+1. Open the ESP32 project in Wokwi.
+2. Open `sketch.ino`.
+3. Upload or paste the Arduino code.
+4. Check the RGB LED and push button connections.
+5. Start the simulation.
+6. Monitor events through the Serial Monitor.
 
-- events.md: Complete event descriptions.
-- architecture.md: System architecture and event flow.
+### Hardware Components
 
-### 11. Author
+- ESP32 development board.
+- One RGB LED (common cathode).
+- Three 220Ω resistors.
+- One push button.
 
-Ivan Sadek
+### GPIO Configuration
 
-### 12. Project Purpose
+| Component | ESP32 GPIO |
+|---|---|
+| RGB Red | GPIO 25 |
+| RGB Green | GPIO 26 |
+| RGB Blue | GPIO 27 |
+| Pedestrian Button | GPIO 14 |
+| RGB Common Cathode | GND |
 
-This project demonstrates the principles of
-Event-Driven Programming using a practical traffic
-intersection simulation.
+The pedestrian button uses the ESP32 internal pull-up resistor (`INPUT_PULLUP`).
+
+---
+
+## 7. Event-Driven Behavior
+
+### Automatic Traffic Control
+
+The system automatically changes traffic light states using timer events.
+
+```text
+GREEN → YELLOW → RED → GREEN
+```
+
+### Pedestrian Request
+
+When the pedestrian button is pressed:
+
+1. A pedestrian request is detected.
+2. The request is stored as pending.
+3. The system completes its current traffic sequence.
+4. The traffic light changes to RED.
+5. Pedestrian crossing is activated.
+6. After five seconds, crossing is completed and GREEN returns.
+
+### Emergency Vehicle
+
+The ESP32 implementation accepts the `E` command through the Serial Monitor.
+
+When an emergency is detected:
+
+1. The emergency event is triggered.
+2. Emergency priority is activated.
+3. The traffic light immediately changes to RED.
+4. After the emergency timer, normal operation resumes.
+
+---
+
+## 8. Testing Results
+
+The following features were tested in the Wokwi simulation:
+
+| Test | Result |
+|---|---|
+| ESP32 initialization | Successful |
+| RGB LED operation | Successful |
+| Automatic traffic sequence | Successful |
+| Pedestrian button detection | Successful |
+| Pedestrian crossing activation | Successful |
+| Pedestrian crossing completion | Successful |
+| Emergency detection | Successful |
+| Emergency priority | Successful |
+
+---
+
+## 9. Event-Driven Architecture
+
+The Python implementation uses a local event queue to manage events.
+
+The ESP32 implementation uses event-producing functions, timer-based event handling and direct event processing.
+
+See:
+
+- [Architecture](architecture.md)
+- [Events Documentation](events.md)
+
+---
+
+## 10. Project Objective
+
+The main objective is to demonstrate the principles of Event-Driven Programming through a practical traffic control application.
+
+The project demonstrates how software and hardware can respond to events, process requests, manage different traffic states and prioritize emergency situations.
+
+---
+
+**Author:** Ivan Sadek  
+**Project:** Event-Driven Smart Traffic Light System
