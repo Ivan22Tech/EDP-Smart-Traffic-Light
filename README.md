@@ -217,3 +217,21 @@ The project demonstrates how software and hardware can respond to events, proces
 
 **Author:** Ivan Sadek  
 **Project:** Event-Driven Smart Traffic Light System
+
+## ESP32 Hardware Simulation
+
+The project also includes an ESP32 hardware simulation using Wokwi.
+
+**Wokwi Simulation:**
+https://wokwi.com/projects/481212779611883521
+
+### Hardware Features
+- Automatic traffic light sequence
+- RGB LED control
+- Pedestrian push button
+- Pedestrian crossing timer
+- Emergency vehicle priority
+- Serial Monitor event logging
+
+### Emergency Testing
+Send `E` through the Serial Monitor to activate emergency priority.
